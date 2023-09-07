@@ -1,5 +1,5 @@
 <template>
-    <div class="data-number" :style="{ color, borderColor: color }">
+    <div class="data-number" :style="{ color, borderColor: color }" @click="() => $emit('click')">
         <p>3的时候红色</p>
         <p>2的时候橙色</p>
         <p>1的时候绿色</p>
@@ -9,6 +9,7 @@
 
 <script setup>
 import { defineExpose, ref } from 'vue'
+import Event from '../event'
 
 const color = ref('')
 

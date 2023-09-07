@@ -5,8 +5,39 @@ import globalDataConfig from './config/kanban'
 import store from './store'
 import datasetFactoryMap from './config/dataset-factory'
 import DataNumber from './components/DataNumber.vue'
+import Event from './event'
+
 
 const dataNumberRef = ref(null);
+
+// 交互事件监听
+Event.on('pageEvent', (type) => {
+  console.log('pageEvent type:', type)
+})
+
+// 数据变换监听
+Event.on('dataEvent', ({ sourceId, data }) => {
+  console.log('dataEvent', sourceId, data)
+  if (data) {
+    const { data: count } = data
+    if (count === 3) {
+      dataNumberRef.value.changeColor('red')
+    }
+
+    if (count === 2) {
+      dataNumberRef.value.changeColor('orange')
+    }
+
+    if (count === 1) {
+      dataNumberRef.value.changeColor('green')
+    }
+  }
+})
+
+
+
+const sourceId = '525EB075-77FF-A56A-F710-DE04E29F3495'
+store.watch(state => state.globalData[sourceId], (data) => nextTick(() => Event.emit('dataEvent', { sourceId, data })), { immediate: true, deep: true })
 
 store.subscribe((mutation, state) => {
   // console.log('store.subscribe1', mutation, state)
@@ -76,29 +107,12 @@ function updateTopData () {
   })
 }
 
-store.watch(data => {
-  const { data: count } = data.globalData['525EB075-77FF-A56A-F710-DE04E29F3495']
-  console.log('store.watch', count)
-  nextTick(() => {
-    if (count === 3) {
-      dataNumberRef.value.changeColor('red')
-    }
-
-    if (count === 2) {
-      dataNumberRef.value.changeColor('orange')
-    }
-
-    if (count === 1) {
-      dataNumberRef.value.changeColor('green')
-    }
-  })
-
-})
 
 </script>
 
 <template>
-  <DataNumber ref="dataNumberRef"></DataNumber>
+  <DataNumber ref="dataNumberRef" v-on:click="() => Event.emit('pageEvent', 'click')">
+  </DataNumber>
 
   <HelloWorld msg="Vite + Vue" />
 
